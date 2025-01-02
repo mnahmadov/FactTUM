@@ -45,8 +45,9 @@ def claim_only_llm(claim):
 
 
 # !!! THESE TOKENS SHOULD BE KEPT PRIVATE AND NOT SHARED !!!
-cloudfare_api = "CLOUDFARE API"
-account_id = "ACCOUNT ID"
+cloudfare_api = "Bearer UNdagTbhR_O3WkU0qhVfO22vmVleKw4YWFy2Gbik"
+account_id = "307ed229b30d79addccada26fcf4bc7d"
+
 
 
 API_BASE_URL = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/"
@@ -92,9 +93,26 @@ def str_to_lst(response):
         print(f"Error parsing response string: {e}")
         return False
 
+def get_reasoning_type(claim, test_data):
+    tags = test_data[claim]['types']
+    resoning_types = []
+    for tag in tags:
+        if tag == 'negation':
+            resoning_types.append('negation')
+            break
+        elif tag == 'num1':
+            resoning_types.append('one-hop')
+        elif tag == 'multi claim':
+            resoning_types.append('conjuction')
+        elif tag == 'existence':
+            resoning_types.append('existence')
+        elif tag == 'multi hop':
+            resoning_types.append('multi hop')
+    return resoning_types
 
-def write_to_csv(filename, claim, true_output, predicted_output):
-    fieldnames = ["claim", "true_output", "predicted_output"]
+
+def write_to_csv(filename, claim, reasoning_type, true_label, predicted_label):
+    fieldnames = ["claim", "reasoning_type", "true_label", "predicted_label"]
     
     with open(filename, mode="a", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
@@ -103,7 +121,7 @@ def write_to_csv(filename, claim, true_output, predicted_output):
         if file.tell() == 0:
             writer.writeheader()
         
-        writer.writerow({"claim": claim, "true_output": true_output, "predicted_output": predicted_output})
+        writer.writerow({"claim": claim, "reasoning_type": reasoning_type, "true_label": true_label, "predicted_label": predicted_label})
 
 
 with open('claim_only/factkg_dataset/factkg_test.pickle', 'rb') as file:
@@ -111,26 +129,23 @@ with open('claim_only/factkg_dataset/factkg_test.pickle', 'rb') as file:
     data = pickle.load(file)
 
 print(len(data.items()))
-# i = 0
-# for claim, information in data.items():
-#     if i < 8932: # this is to avoid the 946th claim that is harmful
-#         i += 1
-#         continue
-#     instruction, content = claim_only_llm(claim)
-#     response = send_request(instruction, content)
+i = 0
+for claim, information in data.items():
+    if i < 8930: # this is to avoid the 946th claim that is harmful
+        i += 1
+        continue
+    instruction, content = claim_only_llm(claim)
+    response = send_request(instruction, content)
 #     print(response)
 #     print("Claim: ", claim)
 #     print("Original Response: ",response)
 
-#     response = str_to_lst(response) # try to convert the response into an actual list
-#     while not response: # if not in the correct format
-#         response = send_request(instruction, content)
-#         response = str_to_lst(response)
+    response = str_to_lst(response) # try to convert the response into an actual list
+    while not response: # if not in the correct format
+        response = send_request(instruction, content)
+        response = str_to_lst(response)
 
-#     true_label = information['Label'][0]
-#     # print(information['types'])
-#     predicted_label = response[0]
-# #     print(type(predicted_label))
-
-#     # reasoning_type = information['types']
-#     write_to_csv("claim_only/first_iteration.csv", claim, true_label, predicted_label)
+    true_label = information['Label'][0]
+    predicted_label = response[0]
+    reasoning_type = get_reasoning_type(claim, data)[0]
+    write_to_csv("claim_only/llama_prompting/prompting_claim_only_v2.csv", claim, reasoning_type, true_label, predicted_label)
