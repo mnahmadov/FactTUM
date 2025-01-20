@@ -36,7 +36,6 @@
   "tie_word_embeddings": true,
   "torch_dtype": "bfloat16",
   "transformers_version": "4.48.0",
-  "unsloth_fixed": true,
   "unsloth_version": "2025.1.5",
   "use_cache": true,
   "vocab_size": 128256

@@ -2061,6 +2061,5 @@
   "model_max_length": 131072,
   "pad_token": "<|finetune_right_pad_id|>",
   "padding_side": "left",
-  "tokenizer_class": "PreTrainedTokenizerFast",
-  "unk_token": null
+  "tokenizer_class": "PreTrainedTokenizerFast"
 }

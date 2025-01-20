@@ -1,7 +1,7 @@
 {
   "best_metric": null,
   "best_model_checkpoint": null,
-  "epoch": 0.04631344942571323,
+  "epoch": 0.7410151908114117,
   "eval_steps": 500,
   "global_step": 500,
   "is_hyper_param_search": false,
@@ -9,45 +9,45 @@
   "is_world_process_zero": true,
   "log_history": [
     {
-      "epoch": 0.009262689885142646,
-      "grad_norm": 0.3020336925983429,
-      "learning_rate": 0.00019911984064483257,
-      "loss": 0.5858,
+      "epoch": 0.14820303816228234,
+      "grad_norm": 0.0828753262758255,
+      "learning_rate": 4e-05,
+      "loss": 1.7345,
       "step": 100
     },
     {
-      "epoch": 0.018525379770285292,
-      "grad_norm": 0.2758723199367523,
-      "learning_rate": 0.00019819335711307733,
-      "loss": 0.2982,
+      "epoch": 0.29640607632456467,
+      "grad_norm": 0.09797187149524689,
+      "learning_rate": 8e-05,
+      "loss": 0.3823,
       "step": 200
     },
     {
-      "epoch": 0.027788069655427936,
-      "grad_norm": 0.1973111629486084,
-      "learning_rate": 0.00019726687358132209,
-      "loss": 0.2732,
+      "epoch": 0.444609114486847,
+      "grad_norm": 0.09175070375204086,
+      "learning_rate": 0.00012,
+      "loss": 0.3264,
       "step": 300
     },
     {
-      "epoch": 0.037050759540570584,
-      "grad_norm": 0.23850823938846588,
-      "learning_rate": 0.00019634039004956687,
-      "loss": 0.261,
+      "epoch": 0.5928121526491293,
+      "grad_norm": 0.10058239847421646,
+      "learning_rate": 0.00016,
+      "loss": 0.2858,
       "step": 400
     },
     {
-      "epoch": 0.04631344942571323,
-      "grad_norm": 0.2144438475370407,
-      "learning_rate": 0.00019541390651781166,
-      "loss": 0.2514,
+      "epoch": 0.7410151908114117,
+      "grad_norm": 0.10701436549425125,
+      "learning_rate": 0.0002,
+      "loss": 0.2608,
       "step": 500
     }
   ],
   "logging_steps": 100,
-  "max_steps": 21592,
+  "max_steps": 2022,
   "num_input_tokens_seen": 0,
-  "num_train_epochs": 2,
+  "num_train_epochs": 3,
   "save_steps": 500,
   "stateful_callbacks": {
     "TrainerControl": {
@@ -61,8 +61,8 @@
       "attributes": {}
     }
   },
-  "total_flos": 1.3803426270879744e+16,
-  "train_batch_size": 2,
+  "total_flos": 2.3213062250540237e+17,
+  "train_batch_size": 8,
   "trial_name": null,
   "trial_params": null
 }
