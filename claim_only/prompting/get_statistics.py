@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 
 
-df = pd.read_csv('finetuned_claim_only/fine_tuned_claim_only_v1.csv', dtype={'true_label': bool, 'predicted_label': bool})
+df = pd.read_csv('with_evidence/prompting/prompting_with_evidence_v0.csv', dtype={'true_label': bool, 'predicted_label': bool})
 
 accuracy = accuracy_score(df['true_label'], df['predicted_label'])
 

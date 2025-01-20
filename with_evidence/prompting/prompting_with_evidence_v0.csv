@@ -1,0 +1,11 @@
+claim,reasoning_type,true_label,predicted_label
+Soccer player does not play for FC Alania Vladikavkaz though he now works for FC Terek Grozny.,negation,False,True
+"Yup, the Khmu people did not have a religion.",negation,False,True
+"AC Hotel Bella Sky is in Copenhagen, Denmark, Marriott International Hotel because 3XN was the architect.",conjuction,True,False
+"Interestingly, the AIDAluna has a top speed of 194.0.",one-hop,False,False
+Baked Alaska is from the country where the leader is called Gérard Larcher.,multi hop,True,False
+What is the name of Félix de Mérode's award?,existence,False,False
+The 3Arena is not at 'Enerhodar'.,negation,True,False
+"Yes, the leader in France is named Manuel Valls.",one-hop,True,False
+"I wish that Ahmet Ertegun, who is from Washington D.C. in the Allier, France, plays the blues.",conjuction,True,False
+"The Athens International Airport serves the city of Athens, in British Ceylon where Alexis Tsipras is the leader.",conjuction,False,False

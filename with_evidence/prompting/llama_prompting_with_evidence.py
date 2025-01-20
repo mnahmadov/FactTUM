@@ -3,44 +3,43 @@ import pickle
 import ast
 import csv
 import pandas as pd
+import ast
+import re
 
 
-def claim_only_llm(claim):
+def with_evidence_llm(claim, evidence):
     instruction = (
         "You are an advanced AI fact-checker trained on a vast corpus, including information from Wikipedia. "
-        "You are given a claim, and your task is to verify whether all the facts in the claim are supported by "
-        "your knowledge base. Use your understanding of the world and factual data to make an accurate judgment. "
+        "You are given a claim and evidence, and your task is to verify whether all the facts in the claim are supported by "
+        "the evidence and your knowledge base. Use your understanding of evidence and the world, and factual data to make an accurate judgment. "
         "Your response must follow the given format exactly as specified below, without any deviation. "
         "### Response Format:"
-        "Your response should be a list with the following structure and have nothing else than this list structure: "
-        "[True/False, 'one sentence of your decision', 'sources used'] "
-        "Ensure that you answer with only the three parts specified, in the correct order."
+        "Your response should be a True/False exactly either True or False"
     )
 
     content = f'''
     ## TASK:
-    Verify the following claim:
+    Verify the following claim using your knowledge and the given evidence:
 
     Claim: {claim}
 
+    Evidence: {evidence}
+
     ### Instructions:
-    Assess whether the claim is true or false based on your knowledge.
+    Assess whether the claim is true or false based on the given evidence and your knowledge.
 
     ### Answer Format:
-    Provide your response as a list with the following items:
-    1. "True" or "False" (single word answer)
-    2. One-sentence explanation of your decision
-    3. Sources you used, if any (link or reference)
+    Provide your response as a boolean answer:
+    "True" or "False" (single word answer)
 
     ### Example 1:
     Claim: "The Earth is flat."
-    Response: ["False", "The Earth is round as confirmed by extensive scientific research and satellite imagery.", "NASA, Scientific American"]
+    Response: "False"
 
     ### Example 2:
     Claim: "Albert Einstein developed the theory of relativity."
-    Response: ["True", "Albert Einstein is widely recognized for formulating the theory of relativity.", "Einstein's published papers, Nobel Prize archives"]
+    Response: "True"
     '''
-   
     return instruction, content
 
 
@@ -70,27 +69,18 @@ def send_request(instruction, content):
     print(output)
     response = output['result']['response']
     return response
+    
 
-def str_to_lst(response):
+def str_to_bool_str(response):
     try:
-        response = ast.literal_eval(response)
-        if not isinstance(response, list) or len(response) != 3:
-            return False
-        # print(response)
-        # print(type(response[0]))
-        if isinstance(response[0], str):
-            stripped = response[0].strip().lower()
-            # print(stripped)
-            if stripped == "true": # here i convert the true/false strings to boolean values
-                response[0] = True
-                return response
-            elif stripped == "false":
-                response[0] = False
-                return response
-        else:
-            return False
-    except (ValueError, SyntaxError) as e:
-        print(f"Error parsing response string: {e}")
+        if isinstance(response, str):
+            # Extract only the first occurrence of "true" or "false" (case insensitive)
+            match = re.search(r'\b(true|false)\b', response, re.IGNORECASE)
+            if match:
+                return [match.group(1).lower() == "true"]  # Convert to boolean list
+        return False
+    except Exception as e:
+        print(f"Error processing response string: {e}")
         return False
 
 def get_reasoning_type(claim, test_data):
@@ -124,28 +114,32 @@ def write_to_csv(filename, claim, reasoning_type, true_label, predicted_label):
         writer.writerow({"claim": claim, "reasoning_type": reasoning_type, "true_label": true_label, "predicted_label": predicted_label})
 
 
-with open('claim_only/factkg_dataset/factkg_test.pickle', 'rb') as file:
+with open('with_evidence/prompting/training_sample_filtered.pickle', 'rb') as file:
     # there is this 946th claim that contains some harmful information that llm refuse to answer
     data = pickle.load(file)
 
 print(len(data.items()))
 i = 0
 for claim, information in data.items():
-    if i < 8930: # this is to avoid the 946th claim that is harmful
-        i += 1
-        continue
-    instruction, content = claim_only_llm(claim)
+    if i == 10: # this is to avoid the 946th claim that is harmful
+        # i += 1
+        break
+    i += 1
+    evidence = information['evidence_filtered']
+    instruction, content = with_evidence_llm(claim, evidence)
     response = send_request(instruction, content)
 #     print(response)
 #     print("Claim: ", claim)
-#     print("Original Response: ",response)
+    print("Original Response: ",response)
 
-    response = str_to_lst(response) # try to convert the response into an actual list
+    response = str_to_bool_str(response) # try to convert the response into an actual list
     while not response: # if not in the correct format
         response = send_request(instruction, content)
-        response = str_to_lst(response)
+        response = str_to_bool_str(response)
 
-    true_label = information['Label'][0]
+    print(response)
+
+    true_label = information['label'][0]
     predicted_label = response[0]
-    reasoning_type = get_reasoning_type(claim, data)[0]
-    write_to_csv("claim_only/llama_prompting/prompting_claim_only_v2.csv", claim, reasoning_type, true_label, predicted_label)
+    reasoning_type = information['reasoning_types'][0]
+    write_to_csv("with_evidence/prompting/prompting_with_evidence_v0.csv", claim, reasoning_type, true_label, predicted_label)
